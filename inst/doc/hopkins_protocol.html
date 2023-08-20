@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Kevin Wright" />
+
+<meta name="date" content="2022-01-06" />
+
+<title>A protocol for Hopkins statistic</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">A protocol for Hopkins statistic</h1>
+<h4 class="author">Kevin Wright</h4>
+<h4 class="date">2022-01-06</h4>
+
+
+
+<p>Hopkins statistic is used to test a Null Hypothesis of spatial
+randomness. Under the null distribution of spatial randomness, the value
+of the statistic should be 0.5.</p>
+<div id="a-protocol-for-using-hopkins-statistic" class="section level1">
+<h1>A protocol for using Hopkins statistic</h1>
+<ol style="list-style-type: decimal">
+<li><strong>Does the data need to be scaled?</strong></li>
+<li><strong>Is the number of events <span class="math inline">\(n &gt;
+100\)</span> and the number of randomly-sampled events at most 10% of
+<span class="math inline">\(n\)</span>?</strong> This is recommended by
+<span class="citation">Cross and Jain (1982)</span>.</li>
+<li><strong>Is spatial randomness of the events even possible?</strong>
+If the events are known or suspected to be correlated, this violates the
+null hypothesis of spatial uniformity, and may also mean that the
+sampling frame is not shaped like a hypercube.</li>
+<li><strong>Could nearest-neighbor events have occurred outside the
+boundary of the sampling frame?</strong> If yes, it may be appropriate
+to calculate nearest-neighbor distances using a torus geometry.</li>
+<li><strong>Is the sampling frame non-rectangular?</strong> If yes, then
+be extremely careful with the use of Hopkins statistic in how points are
+samples from <span class="math inline">\(U\)</span>.</li>
+<li><strong>Is the dimension of the data much greater than 2?</strong>
+Edge effects are more common in higher dimensions.</li>
+</ol>
+<p>The important point of this protocol is to raise awareness of
+potential problems. We leave it to the practitioner to decide what do
+with the answers to these questions.</p>
+<div id="example-1" class="section level3">
+<h3>Example 1</h3>
+<p>We can simulate 1000 points uniformly in a unit square and then
+calculate Hopkins statistic, which is 0.52.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(hopkins)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>dat1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">runif</span>(<span class="dv">2000</span>), <span class="at">ncol=</span><span class="dv">2</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">plot</span>(dat1)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">hopkins</span>(dat1) <span class="co"># .52</span></span></code></pre></div>
+<pre><code>## [1] 0.5217802</code></pre>
+</div>
+<div id="example-2" class="section level3">
+<h3>Example 2</h3>
+<p>Simulate 1000 points from a bivariate normal distribution (with 0
+covariance). The sampling frame for generating new points <span class="math inline">\(u\)</span> is from the minimum value to maximum
+value of the events in each axis. Roughly -3 to 3 for Normal data. The
+points form a circular “cluster” within this bounding box and the value
+of Hopkins statistic is 0.89.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>dat2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">1000</span>), <span class="at">ncol=</span><span class="dv">2</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">plot</span>(dat2)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">hopkins</span>(dat2) <span class="co"># .89</span></span></code></pre></div>
+<pre><code>## [1] 0.8927865</code></pre>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-cross1982measurement" class="csl-entry">
+Cross, GR, and AK Jain. 1982. <span>“Measurement of Clustering
+Tendency.”</span> In <em>Theory and Application of Digital Control</em>,
+315–20. Elsevier. <a href="https://doi.org/10.1016/B978-0-08-027618-2.50054-1">https://doi.org/10.1016/B978-0-08-027618-2.50054-1</a>.
+</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
